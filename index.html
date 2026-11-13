@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>유우령의 레트로 아케이드</title>
+    <!-- Tailwind CSS 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (진짜 오락실 픽셀 폰트: Press Start 2P) 및 한글 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DungGeunMo&display=swap" rel="stylesheet">
+    <style>
+        /* 전역 레트로 폰트 및 분홍빛 은하수 배경 설정 */
+        body {
+            font-family: 'Press Start 2P', 'DungGeunMo', monospace;
+            background: linear-gradient(135deg, #1f0b24 0%, #3a0d2f 35%, #59163c 70%, #200424 100%);
+            background-attachment: fixed;
+            color: #ffffff;
+            overflow-x: hidden;
+            cursor: default;
+            line-height: 1.8;
+        }
+
+        /* 은하수 별빛 가루 효과 오버레이 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(pink, rgba(255,192,203,.15) 1px, transparent 30px),
+                radial-gradient(rgba(255,105,180,0.4), transparent 60px);
+            background-size: 550px 550px, 350px 350px, 450px 450px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* 폰트 크기 한층 더 대폭 확대 및 가독성 개선 */
+        body, p, span, div {
+            font-size: 1.3rem;
+        }
+
+        h1 {
+            font-size: 2.3rem !important;
+            letter-spacing: -1px;
+        }
+
+        h2 {
+            font-size: 1.8rem !important;
+        }
+
+        h3 {
+            font-size: 1.5rem !important;
+            line-height: 1.7 !important;
+        }
+
+        /* 레트로 스캔라인 및 네온 효과 */
+        .arcade-box {
+            border: 4px solid #ff3399;
+            box-shadow: 0 0 18px rgba(255, 51, 153, 0.6), inset 0 0 15px rgba(255, 51, 153, 0.4);
+            background: rgba(30, 8, 38, 0.85);
+        }
+
+        .arcade-button {
+            border: 3px solid #ff77ff;
+            box-shadow: 0 0 12px rgba(255, 119, 255, 0.6);
+            transition: all 0.1s ease;
+            font-family: 'Press Start 2P', 'DungGeunMo', monospace;
+            font-size: 1.2rem;
+            background-color: #2b0b38;
+            color: #ffccff;
+        }
+
+        .arcade-button:hover {
+            background-color: #ff77ff;
+            color: #1f0b24;
+            box-shadow: 0 0 25px #ff77ff;
+            transform: translateY(-2px);
+        }
+
+        .arcade-button:active {
+            transform: translateY(2px);
+        }
+
+        /* 카드 뒤집기 효과 */
+        .flip-card {
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #ff99cc;
+            box-shadow: 0 0 12px rgba(255, 153, 204, 0.5);
+            background: #280d38;
+            padding: 1.2rem;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
+            background: #3c124e;
+            color: #ffccff;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* 마우스 반짝이 효과 스타일 */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            font-size: 16px;
+            animation: sparkle-anim 0.8s linear forwards;
+            z-index: 9999;
+        }
+
+        @keyframes sparkle-anim {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* 깜빡이는 애니메이션 */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .blink-text {
+            animation: blink 1s infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-10 px-4 flex flex-col items-center justify-between">
+
+    <!-- 헤더 영역 -->
+    <header class="text-center mb-10 w-full max-w-4xl">
+        <div class="inline-block arcade-box px-8 py-5 rounded-lg mb-5">
+            <h1 class="text-[#ff007f] tracking-widest blink-text">🪙 INSERT COIN 🪙</h1>
+        </div>
+        <h2 class="text-[#ffe600] mt-4">PLAYER : <span class="text-[#00f0ff]">유우령</span></h2>
+        <p class="text-gray-300 mt-4" style="font-family: 'DungGeunMo', monospace; font-size: 1.2rem;">레트로 오락실에 입장하신 것을 환영합니다!</p>
+    </header>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="w-full max-w-4xl space-y-10">
+
+        <!-- 메인 컨텐츠 영역 -->
+        <section class="arcade-box p-8 rounded-lg">
+            <h3 class="text-[#ffe600] mb-8 text-center leading-relaxed">✨ FAVORITE STUFF ✨<br><span class="text-xs text-gray-400" style="font-size: 1.1rem;">(카드를 눌러보세요!)</span></h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <!-- 카드 1: 강아지 -->
+                <div class="flip-card h-64 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner rounded-lg">
+                        <div class="flip-card-front rounded-lg">
+                            <span class="text-6xl mb-3">🐶</span>
+                            <span class="text-[#ffe600]" style="font-size: 1.3rem;">강아지</span>
+                            <span class="text-xs text-gray-400 mt-3" style="font-size: 0.95rem;">(Click!)</span>
+                        </div>
+                        <div class="flip-card-back rounded-lg">
+                            <strong class="text-[#ffe600] block mb-2" style="font-size: 1.15rem;">[이유]</strong> 세상에서 제일 귀여운 생명체! 바라만 봐도 힐링되고 내조(?)받는 기분이 들기 때문이지!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 카드 2: 송하영 -->
+                <div class="flip-card h-64 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner rounded-lg">
+                        <div class="flip-card-front rounded-lg">
+                            <span class="text-6xl mb-3">🎤</span>
+                            <span class="text-[#ffe600]" style="font-size: 1.3rem;">송하영</span>
+                            <span class="text-xs text-gray-400 mt-3" style="font-size: 0.95rem;">(Click!)</span>
+                        </div>
+                        <div class="flip-card-back rounded-lg">
+                            <strong class="text-[#ffe600] block mb-2" style="font-size: 1.15rem;">[이유]</strong> 목소리도 완벽, 매력도 완벽! 보고 있으면 시간 가는 줄 모르는 나의 최애 바이러스!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 카드 3: 노래 -->
+                <div class="flip-card h-64 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner rounded-lg">
+                        <div class="flip-card-front rounded-lg">
+                            <span class="text-6xl mb-3">🎧</span>
+                            <span class="text-[#ffe600]" style="font-size: 1.3rem;">노래</span>
+                            <span class="text-xs text-gray-400 mt-3" style="font-size: 0.95rem;">(Click!)</span>
+                        </div>
+                        <div class="flip-card-back rounded-lg">
+                            <strong class="text-[#ffe600] block mb-2" style="font-size: 1.15rem;">[이유]</strong> 이어폰을 꽂는 순간 이 세상의 주인공은 나야! 장르 불문 귀가 즐거워야 살아갈 수 있음!
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- OX 퀴즈 섹션 -->
+        <section class="arcade-box p-8 rounded-lg text-center">
+            <h3 class="text-[#ffe600] mb-6">🎮 ARCADE OX QUIZ 🎮</h3>
+            <p class="mb-8 text-[#00f0ff]" style="font-family: 'DungGeunMo', monospace; font-size: 1.7rem;">"나는 지금 집에가고싶다."</p>
+            <div class="flex justify-center gap-8 mb-6">
+                <button onclick="checkAnswer(true)" class="arcade-button bg-[#1a0b2e] text-[#00f0ff] font-bold py-4 px-12 rounded text-2xl">O</button>
+                <button onclick="checkAnswer(false)" class="arcade-button bg-[#1a0b2e] text-[#ff007f] font-bold py-4 px-12 rounded text-2xl">X</button>
+            </div>
+            <div id="quiz-result" class="font-bold min-h-[50px]" style="font-family: 'DungGeunMo', monospace; font-size: 1.4rem;"></div>
+        </section>
+
+        <!-- 오늘의 운세 섹션 -->
+        <section class="arcade-box p-8 rounded-lg text-center">
+            <h3 class="text-[#ffe600] mb-6">🔮 오늘의 운세 뽑기 🔮</h3>
+            <button onclick="drawFortune()" class="arcade-button bg-[#ff007f] text-white font-bold py-4 px-8 rounded-lg mb-6" style="font-size: 1.3rem;">
+                운세 카드 뽑기! 🎲
+            </button>
+            <div id="fortune-display" class="text-[#00f0ff] min-h-[80px] p-6 border-2 border-dashed border-[#00f0ff] rounded bg-[#100326] flex items-center justify-center" style="font-family: 'DungGeunMo', monospace; font-size: 1.4rem;">
+                버튼을 눌러 오늘의 운세를 확인해 보세요!
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 푸터 영역 -->
+    <footer class="mt-10 text-center text-gray-400" style="font-size: 1rem;">
+        <p>© 2026 YU-WOORYEONG ARCADE. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <!-- 자바스크립트 로직 -->
+    <script>
+        /* 1. OX 퀴즈 정답 판정 함수 */
+        function checkAnswer(userChoice) {
+            const resultDiv = document.getElementById('quiz-result');
+            // 정답은 O (true)
+            if (userChoice === true) {
+                resultDiv.innerHTML = "🎉 정답입니다! (축하 효과: 반짝반짝 스테이지 클리어! 🌟)";
+                resultDiv.style.color = "#00ff66";
+                createConfetti();
+            } else {
+                resultDiv.innerHTML = "💥 땡! 틀렸습니다! (아쉬움 효과: Game Over 소리가 들리는 중... 😢)";
+                resultDiv.style.color = "#ff0055";
+            }
+        }
+
+        /* 정답 맞혔을 때 화면 효과 예시 (메시지 반짝임) */
+        function createConfetti() {
+            for (let i = 0; i < 25; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                sparkle.innerHTML = '✨';
+                sparkle.style.left = Math.random() * window.innerWidth + 'px';
+                sparkle.style.top = Math.random() * window.innerHeight + 'px';
+                sparkle.style.setProperty('--tx', (Math.random() - 0.5) * 120 + 'px');
+                sparkle.style.setProperty('--ty', (Math.random() - 0.5) * 120 + 'px');
+                document.body.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 800);
+            }
+        }
+
+        /* 2. 오늘의 운세 10개 이상 데이터 및 랜덤 뽑기 */
+        const fortunes = [
+            "⭐ 대길! 오늘 하루는 뭘 해도 다 잘 풀리는 치트키 발동일!",
+            "☕ 휴식이 필요한 날! 좋아하는 노래를 들으며 잠시 여유를 가져보세요.",
+            "🐶 우연히 길에서 귀여운 강아지를 만나 심장이 아파질 수 있습니다.",
+            "🚀 에너지 충전 200%! 미뤄두었던 일을 순식간에 해치울 수 있어요.",
+            "🍀 소소한 행운이 따르는 날! 주머니 속을 뒤져보면 천 원짜리가 나올지도?",
+            "💤 '조금만 더 잘까?' 하는 생각이 종일 머릿속을 맴도는 평화로운 하루.",
+            "🍕 오늘 저녁 메뉴는 당신이 가장 좋아하는 맛있는 음식으로 당첨!",
+            "🎵 음악 감상이 곧 보약! 이어폰을 낀 순간 세상의 주인공이 됩니다.",
+            "💡 생각지도 못한 재밌는 아이디어가 번뜩이는 영감 폭발의 날!",
+            "🌈 조금 피곤하더라도 저녁엔 기분 좋은 소식이 찾아올 거예요!",
+            "🎮 레트로 게임 한 판으로 스트레스를 날려버리기 딱 좋은 날씨입니다!"
+        ];
+
+        function drawFortune() {
+            const randomIndex = Math.floor(Math.random() * fortunes.length);
+            const fortuneDisplay = document.getElementById('fortune-display');
+            fortuneDisplay.style.opacity = 0;
+            setTimeout(() => {
+                fortuneDisplay.innerHTML = fortunes[randomIndex];
+                fortuneDisplay.style.opacity = 1;
+                fortuneDisplay.style.transition = "opacity 0.3s ease-in-out";
+            }, 150);
+        }
+
+        /* 3. 마우스를 따라다니는 반짝이 효과 */
+        document.addEventListener('mousemove', function(e) {
+            if (Math.random() < 0.3) {
+                const sparkle = document.createElement('div');
+                sparkle.classList.add('sparkle');
+                const icons = ['✨', '⭐', '💫', '💖'];
+                sparkle.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+                
+                sparkle.style.left = e.clientX + 'px';
+                sparkle.style.top = e.clientY + 'px';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 25 + Math.random() * 35;
+                sparkle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                sparkle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                
+                document.body.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 800);
+            }
+        });
+    </script>
+</body>
+</html>
