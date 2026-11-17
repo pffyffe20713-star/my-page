@@ -240,6 +240,7 @@ html.st-dark img,html.st-dark video,html.st-dark iframe,html.st-dark canvas{filt
     <a class="st-nav-a" href="index.html">홈</a>
     <a class="st-nav-a is-on" href="about.html">소개</a>
     <a class="st-nav-a" href="dream.html">꿈</a>
+    <a class="st-nav-a" href="dream.html">happy</a>
   </div>
 </nav>
 
@@ -619,7 +620,7 @@ html.st-dark img,html.st-dark video,html.st-dark iframe,html.st-dark canvas{filt
       var key = list.length + '|' + JSON.stringify(list[list.length - 1] || '');
       if (key === last) return; last = key;
       ul.innerHTML = '';
-      count.textContent = list.length >= 50 ? '최근 방명록 100개' : '방명록 ' + list.length + '개';
+      count.textContent = list.length >= 50 ? '최근 방명록 50개' : '방명록 ' + list.length + '개';
       list.slice().reverse().forEach(function (r) {
         var li = el('li'); li.appendChild(el('b', '', r['닉네임'] || '익명')); li.appendChild(el('small', '', time(r['시간'])));
         li.appendChild(el('p', '', r['내용'] || '')); ul.appendChild(li);
